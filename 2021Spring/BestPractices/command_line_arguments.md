@@ -3,12 +3,12 @@
 If a program you submit to a compute node requires inputs, you should pass
 them with command line arguments, not keyboarding in interactively.
 
-We found that some students run their code on the head node directly, not because
+We find that some students run their code on the head node directly, not because
 they do not know the rules of using a cluster, but their Slurm jobs stall on a compute node, 
 so they feel forced to try it interactively on the head node. This is possibly 
 the result of writing a program that expects `std::cin` inputs.
 If this is your case, please read and let us get this out of the way 
-before we write programs that would become a problem when running on the head node.
+before we write programs that, if running on the head node, would be problematic.
 
 ---
 
@@ -53,17 +53,17 @@ int main(int argc, char *argv[]) {
 2. After the program is called, `argc` will be the total number of arguments 
 (typically 1 or more, since the program name counts as the first argument), `argv`
 will be the array of character pointers listing all the arguments.
-3. Parse `argv` as needed. For example, if you would like to use `argv[i]` as an integer
+3. Parse `argv` as needed. For example, if you would like to use `argv[1]` as an integer
 ```c++
-int N = std::atoi(argv[i]);
+int N = std::atoi(argv[1]);
 ```
 or as  a floating point number
 ```c++
-double X = std::stod(argv[i]);
+double N = std::stod(argv[1]);
 ```
 or as a string  
 ```c++
-std::string s(argv[i]);
+std::string N(argv[1]);
 ```
 
 
