@@ -2,7 +2,7 @@
 
 In scientific computing, it often becomes necessary to produce sets of (pseudo-) random numbers. As with many tools which have been updated in C++, the best practice for new programs is to eschew the C-style `rand` function in favor of the new C++ `<random>` library.
 
-For some background on Pseudo-Random Number Generators (PRNGs), read the next section. If you don't care about the background and just want to know how why `rand` isn't recommended, [continue below](#whats-wrong-with-rand).
+For some background on Pseudo-Random Number Generators (PRNGs), read the next section. If you don't care about the background and just want to know how why `rand` isn't recommended, [continue below](#whats-wrong-with-rand). If you just want to see how it works in C++, [jump ahead](#the-c++-way).
 
 ## Random Number Generators
 
@@ -24,7 +24,7 @@ const int RANGE = 10;
 int random_value = rand() % (RANGE + 1);
 ```
 
-This idiom returns pseudo-random positive integers between `0` and `RANGE`, but the values aren't uniformly distributed. Depending on the range and the seed, this poor distribution can even bias the results of an experiment.
+This idiom returns pseudo-random positive integers between `0` and `RANGE`, but the values aren't uniformly distributed. Depending on the modulus and the number of generated values, this poor distribution can even bias the results of an experiment.
 
 ### Some implementations of the PRNG function produce patterns in the lower-order bits
 
@@ -34,7 +34,90 @@ These issues can be remedied somewhat by clever manipulation of the output of `r
 
 ## The C++ Way
 
-(coming soon)
+**C++11** (the revision of the C++ standard published in 2011) introduced a random number generation library which provides adaptors for several PRNG algorithms.
 
+For example, a predefined initialization of the Mersenne Twister algorithm ([Matsumoto and Nishimura, 1998](https://dl.acm.org/doi/10.1145/272991.272995)) can be set up using the steps below:
+
+```c++
+int my_seed = 759;
+std::mt19937 generator(my_seed);
+```
+
+This initializes the engine using a predefined seed, after which new values can be generated using the `()` operator.
+
+```c++
+auto pseudorandom_value = generator();
+```
+
+### Distributions
+
+A generator can be used directly, but there are some limitations on each generator in terms of the type and range of values that it will produce. It is often more suitable to use one of the predefined adapters for the desired distribution.
+
+```c++
+const float min = -64.0, max = 27.0;
+std::uniform_real_distribution<float> dist(min, max);
+
+float pseudorandom_float = dist(generator);
+```
+
+This method uses the randomness provided by the generator to produce a value within the given distribution. There are many distributions listed in [the documentation](https://en.cppreference.com/w/cpp/header/random) for `<random>`; the generated values can be tailored to a similarly large number of scenarios.
+
+### Seeding the PRNG
+
+For any given seed of the random number generator, the algorithm will produce a deterministic sequence of values. For this reason, it is often desired to seed the random number generator using a different value on each invocation. To match the idiom commonly used in C, the generator can be seeded using the current time.
+
+```c++
+auto seed = std::system_clock::now().time_since_epoch().count();
+std::mt19937 generator(seed);
+```
+
+For situations which require high-quality randomness, it's possible to use the system's non-deterministic entropy source to produce the seed. 
+
+```c++
+std::random_device entropy_source;
+std::mt19937 generator(entropy_source());
+```
+
+> NOTE: It might seem intuitive to simply use the hardware entropy source to directly generate random values, but system entropy can quickly become exhausted if it is consumed faster than it can be produced. For this reason, it's usually best to use this source only to seed a PRNG.
+
+### A More Complete Example
+
+The following example uses another Mersenne Twister implementation to generate 2¹⁶ random `double`s in the range [10, 15] and then prints the mean of those values.
+
+```c++
+#include <iostream>
+#include <random>
+#include <vector>
+
+int main(int argc, char** argv) {
+	const int N = 65536;
+
+	std::random_device entropy_source;
+
+	// 64-bit variant of mt19937 isn't necessary here, but it's just an example
+	std::mt19937_64 generator(entropy_source()); 
+
+	std::uniform_real_distribution<double> dist(10., 20.);
+
+	std::vector<double> random_values(N);
+
+	// Write a random value to each slot in N
+	for (auto& value : random_values) {
+		value = dist(generator);
+	}
+
+	// Perform a reduction to get the sum of the values.
+	double sum = std::reduce(
+		random_values.begin(), 
+		random_values.end(),
+		0.0
+	);
+
+	// Print the mean, should be close to 15.0
+	std::cout << sum / static_cast<double>(N) << std::endl;
+
+	return 0;
+}
+```
 
 
