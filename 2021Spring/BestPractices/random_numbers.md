@@ -2,7 +2,7 @@
 
 In scientific computing, it often becomes necessary to produce sets of (pseudo-) random numbers. As with many tools which have been updated in C++, the best practice for new programs is to eschew the C-style `rand` function in favor of the new C++ `<random>` library.
 
-For some background on Pseudo-Random Number Generators (PRNGs), read the next section. If you don't care about the background and just want to know how why `rand` isn't recommended, [continue below](#whats-wrong-with-rand). If you just want to see how it works in C++, [jump ahead](#the-c++-way).
+For some background on Pseudo-Random Number Generators (PRNGs), read the next section. If you don't care about the background and just want to know how why `rand` isn't recommended, [continue below](#whats-wrong-with-rand). If you just want to see how it works in C++, [jump ahead](#the-c-way).
 
 ## Random Number Generators
 
