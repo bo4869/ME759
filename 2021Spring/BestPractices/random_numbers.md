@@ -39,8 +39,8 @@ These issues can be remedied somewhat by clever manipulation of the output of `r
 For example, a predefined initialization of the Mersenne Twister algorithm ([Matsumoto and Nishimura, 1998](https://dl.acm.org/doi/10.1145/272991.272995)) can be set up using the steps below:
 
 ```c++
-int my_seed = 759;
-std::mt19937 generator(my_seed);
+int some_seed = 759;
+std::mt19937 generator(some_seed);
 ```
 
 This initializes the engine using a predefined seed, after which new values can be generated using the `()` operator.
@@ -54,13 +54,21 @@ auto pseudorandom_value = generator();
 A generator can be used directly, but there are some limitations on each generator in terms of the type and range of values that it will produce. It is often more suitable to use one of the predefined adapters for the desired distribution.
 
 ```c++
-const float min = -64.0, max = 27.0;
-std::uniform_real_distribution<float> dist(min, max);
+const float minval = -64.0, maxval = 27.0;
+std::uniform_real_distribution<float> dist(minval, maxval);
 
 float pseudorandom_float = dist(generator);
 ```
 
 This method uses the randomness provided by the generator to produce a value within the given distribution. There are many distributions listed in [the documentation](https://en.cppreference.com/w/cpp/header/random) for `<random>`; the generated values can be tailored to a similarly large number of scenarios.
+
+> The `uniform_real_distribution` adapter produces a distribution on an interval of `[minval, maxval)` which may not be the desired behavior. To generate values within a closed interval, the following idiom may be applied to the maximum value of a distribution represented using some floating point type `Real`
+> ```c++
+> std::uniform_real_distribution<Real>(
+> 	minval,
+> 	std::nextafter(maxval, std::numeric_limits<Real>::max()
+> );
+> ```
 
 ### Seeding the PRNG
 
