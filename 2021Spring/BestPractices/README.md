@@ -5,6 +5,7 @@
 - [Piazza Etiquette](piazza.md)
 - [Recommended Software](software.md)
 - [Transferring Files TO/FROM Euler](transferring_files.md)
+- [Using an Interactive Debugger on Euler](debugging_on_euler.md)
 
 ### C++ Programming
 
